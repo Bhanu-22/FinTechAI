@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+:root {
+  /* Theme 1: Default "Lovable" (Light blue/purple/warm) */
+  --bg-main: #ffffff;
+  /* Pure white bg */
+  --text-main: #111827;
+  /* Very dark gray text for contrast */
+  /* The 3 Moving Gradient Colors */
+  --grad-1: #A78BFA;
+  /* Purple */
+  --grad-2: #60A5FA;
+  /* Blue */
+  --grad-3: #FBBF24;
+  /* Warm Yellow/Orange */
+
+  /* Retaining existing variables for compatibility if needed, or mapping them */
+  --orb1: var(--grad-1);
+  --orb2: var(--grad-2);
+  --btn-text: #ffffff;
+}
+
+[data-theme="sunrise"] {
+  /* Theme 2: Bright Sunset */
+  --bg-main: #fff7ed;
+  /* Very light orange tint bg */
+  --text-main: #431407;
+  /* Dark brown text */
+  --grad-1: #fb7185;
+  /* Rose */
+  --grad-2: #f472b6;
+  /* Pink */
+  --grad-3: #fdba74;
+  /* Orange */
+
+  --orb1: var(--grad-1);
+  --orb2: var(--grad-2);
+  --btn-text: #ffffff;
+}
+
+[data-theme="ocean"] {
+  /* Theme 3: Fresh Water */
+  --bg-main: #f0f9ff;
+  /* Very light blue tint bg */
+  --text-main: #0c4a6e;
+  /* Dark blue text */
+  --grad-1: #22d3ee;
+  /* Cyan */
+  --grad-2: #818cf8;
+  /* Indigo */
+  --grad-3: #34d399;
+  /* Emerald Green */
+
+  --orb1: var(--grad-1);
+  --orb2: var(--grad-2);
+  --btn-text: #ffffff;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Standard CSS Animations for the blobs */
+@keyframes move1 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30%, -20%) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20%, 20%) scale(0.9);
+  }
+}
+
+@keyframes move2 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-40%, -30%) scale(1.2);
+  }
+}
+
+@keyframes move3 {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(30%, 30%) scale(0.8);
+  }
+}
+
+.animate-blob-1 {
+  animation: move1 20s infinite alternate ease-in-out;
+}
+
+.animate-blob-2 {
+  animation: move2 25s infinite alternate ease-in-out;
+}
+
+.animate-blob-3 {
+  animation: move3 30s infinite alternate ease-in-out;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
