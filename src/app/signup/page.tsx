@@ -1,10 +1,48 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { auth } from "@/lib/auth";
+
 import Link from "next/link";
 import AntigravityBackground from "@/components/AntigravityBackground";
 import { Mail, Lock, User, Briefcase } from "lucide-react";
 
 export default function SignupPage() {
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [accountType, setAccountType] = useState("gig_worker");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const router = useRouter();
+
+    const handleSignup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
+
+        try {
+            // 1. Signup
+            await auth.signup({
+                email,
+                username: email, // Use email as username
+                password,
+                first_name: fullName.split(" ")[0],
+                last_name: fullName.split(" ").slice(1).join(" ") || "",
+                re_password: password,
+            });
+
+            // 2. Redirect to Login
+            router.push("/login?registered=true");
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || "Failed to create account.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen w-full flex">
             {/* Left Panel - Visual (Desktop Only) */}
@@ -44,7 +82,13 @@ export default function SignupPage() {
                     </div>
 
                     {/* Form */}
-                    <form className="space-y-5">
+                    <form className="space-y-5" onSubmit={handleSignup}>
+                        {error && (
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-3 rounded-xl text-sm text-center">
+                                {error}
+                            </div>
+                        )}
+
                         {/* Full Name */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-[var(--text-main)] ml-1">Full Name</label>
@@ -53,7 +97,10 @@ export default function SignupPage() {
                                 <input
                                     type="text"
                                     placeholder="Rahul Singh"
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl p-3 pl-10 text-[var(--text-main)] placeholder:text-[var(--text-main)]/30 focus:border-[var(--orb1)] focus:ring-1 focus:ring-[var(--orb1)] outline-none transition-all"
+                                    required
                                 />
                             </div>
                         </div>
@@ -66,7 +113,10 @@ export default function SignupPage() {
                                 <input
                                     type="email"
                                     placeholder="name@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl p-3 pl-10 text-[var(--text-main)] placeholder:text-[var(--text-main)]/30 focus:border-[var(--orb1)] focus:ring-1 focus:ring-[var(--orb1)] outline-none transition-all"
+                                    required
                                 />
                             </div>
                         </div>
@@ -77,6 +127,8 @@ export default function SignupPage() {
                             <div className="relative">
                                 <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-main)] opacity-40 w-5 h-5" />
                                 <select
+                                    value={accountType}
+                                    onChange={(e) => setAccountType(e.target.value)}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl p-3 pl-10 text-[var(--text-main)] focus:border-[var(--orb1)] focus:ring-1 focus:ring-[var(--orb1)] outline-none transition-all appearance-none cursor-pointer"
                                 >
                                     <option value="" disabled className="bg-gray-800 text-white">Select your role</option>
@@ -99,16 +151,20 @@ export default function SignupPage() {
                                 <input
                                     type="password"
                                     placeholder="Create a strong password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="w-full bg-white/5 border border-white/10 rounded-xl p-3 pl-10 text-[var(--text-main)] placeholder:text-[var(--text-main)]/30 focus:border-[var(--orb1)] focus:ring-1 focus:ring-[var(--orb1)] outline-none transition-all"
+                                    required
                                 />
                             </div>
                         </div>
 
                         <button
-                            type="button"
-                            className="w-full bg-[var(--orb1)] text-[var(--btn-text)] font-bold py-3 rounded-xl hover:opacity-90 hover:scale-[1.01] transition-all shadow-lg shadow-[var(--orb1)]/20 mt-4"
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-[var(--orb1)] text-[var(--btn-text)] font-bold py-3 rounded-xl hover:opacity-90 hover:scale-[1.01] transition-all shadow-lg shadow-[var(--orb1)]/20 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Create Account
+                            {loading ? "Creating Account..." : "Create Account"}
                         </button>
                     </form>
 

@@ -20,6 +20,45 @@
   --btn-text: #ffffff;
 }
 
+[data-theme="gig"] {
+  /* Theme: Gig Vertical (Raju Kirana - Warm/Trust) */
+  --bg-main: #fffbf5;
+  /* Soft Cream */
+  --text-main: #1f2937;
+  /* Dark Grey */
+  --gig-orange: #E67E22;
+  /* Brand Orange */
+  --gig-green: #27AE60;
+  /* Success Green */
+  --gig-card: #ffffff;
+  /* Card White */
+  --grad-1: #E67E22;
+  --grad-2: #F39C12;
+  --grad-3: #D35400;
+
+  --orb1: var(--gig-orange);
+  --btn-text: #ffffff;
+}
+
+[data-theme="gig-dark"] {
+  /* Theme: GigSuper (Premium Dark Mode) */
+  --bg-main: #0B1E1B; /* Deep Jungle Green */
+  --bg-card: #132A26; /* Lighter Green Surface */
+  --text-main: #FFFFFF;
+  --text-muted: #A0B3B0;
+  
+  --gig-primary: #00E599; /* Neon Mint */
+  --gig-accent: #00E599; 
+  --gig-negative: #FF6B6B; /* Soft Red */
+
+  --grad-1: #00E599;
+  --grad-2: #16A34A;
+  --grad-3: #132A26;
+
+  --orb1: var(--gig-primary);
+  --btn-text: #0B1E1B; /* Dark Text on Mint Button */
+}
+
 [data-theme="sunrise"] {
   /* Theme 2: Bright Sunset */
   --bg-main: #fff7ed;

@@ -29,4 +29,7 @@ urlpatterns = [
     path('api/inventory/', include('inventory.urls')),
     path('api/sales/', include('sales.urls')),
     path('api/customers/', include('customers.urls')),
+    
+    # Gig Worker API
+    path('api/gig/', include('gig_api.urls')),
 ]

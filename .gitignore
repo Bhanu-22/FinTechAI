@@ -61,3 +61,21 @@ env/
 # ide
 .vscode/
 .idea/
+
+# custom logs
+tsc_errors*.txt
+
+# python caches
+.mypy_cache/
+.pytest_cache/
+
+# debug scripts
+backend/debug_*.py
+backend/verify_*.py
+backend/check_user.py
+backend/cleanup_shifts.py
+backend/create_test_user.py
+backend/fix_user_role.py
+backend/reset_bhanu.py
+
+
