@@ -23,6 +23,11 @@ class InvoiceItem(models.Model):
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2) # Price AT THE MOMENT of sale
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(quantity__gte=0), name='invoice_item_quantity_non_negative'),
+        ]
+
     def save(self, *args, **kwargs):
         # Auto-save the product name if not set
         if self.product and not self.product_name:

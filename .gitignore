@@ -30,6 +30,9 @@ backend/env/
 backend/.venv/
 backend.log
 *.log
+backend/media/
+backend/staticfiles/
+backend/local_settings.py
 
 # Environment variables
 .env

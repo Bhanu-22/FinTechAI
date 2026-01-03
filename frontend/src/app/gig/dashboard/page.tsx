@@ -15,6 +15,9 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti"; // Requires npm install canvas-confetti
 
 // Types
+import { API_URL } from "../../../config";
+
+// Types
 interface DashboardData {
     earnings_total: number;
     expenses_total: number;
@@ -30,10 +33,29 @@ interface HabitStatus {
     day_completed: boolean;
 }
 
+const fetchWithRetry = async (url: string, options: any, retries = 3, backoff = 1000): Promise<Response> => {
+    try {
+        const res = await fetch(url, options);
+        // Retry on 5xx errors or network errors (which go to catch)
+        if (!res.ok && res.status >= 500) {
+            throw new Error(`Server error: ${res.status}`);
+        }
+        return res;
+    } catch (err) {
+        if (retries > 0) {
+            console.warn(`Fetch failed, retrying in ${backoff}ms... (${retries} left)`);
+            await new Promise(r => setTimeout(r, backoff));
+            return fetchWithRetry(url, options, retries - 1, backoff * 2);
+        }
+        throw err;
+    }
+}
+
 export default function DashboardPage() {
     const router = useRouter();
     const [data, setData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [user] = useState("Ramesh");
 
     useEffect(() => {
@@ -51,28 +73,44 @@ export default function DashboardPage() {
                 const today = new Date().toISOString().split('T')[0];
 
                 // 1. Fetch Daily Summary
-                const res = await fetch(`http://127.0.0.1:8000/api/gig/summary/daily?date=${today}`, {
-                    headers: { "Authorization": `JWT ${token}` }
-                });
-
-                if (res.ok) {
-                    const json = await res.json();
-                    setData(json);
-
-                    // 2. Check Habit Status for Celebration (GW-016)
-                    const statusRes = await fetch(`http://127.0.0.1:8000/api/gig/summary/status`, {
+                try {
+                    const res = await fetchWithRetry(`${API_URL}/api/gig/summary/daily?date=${today}`, {
                         headers: { "Authorization": `JWT ${token}` }
                     });
 
-                    if (statusRes.ok) {
-                        const statusJson: HabitStatus = await statusRes.json();
-                        if (statusJson.day_completed) {
-                            triggerCelebration();
+                    if (res.ok) {
+                        const json = await res.json();
+                        setData(json);
+
+                        // 2. Check Habit Status for Celebration (GW-016)
+                        const statusRes = await fetch(`${API_URL}/api/gig/summary/status`, {
+                            headers: { "Authorization": `JWT ${token}` }
+                        });
+
+                        if (statusRes.ok) {
+                            const statusJson: HabitStatus = await statusRes.json();
+                            if (statusJson.day_completed) {
+                                triggerCelebration();
+                            }
                         }
+                    } else {
+                        if (res.status === 401) {
+                            // Handle token expiry if not handled by interceptor logic (usually we want a centralized fetch wrapper)
+                            // For now assuming the page redirects if 401 persists
+                            setError("Session expired. Please login again.");
+                            localStorage.removeItem("access_token");
+                            router.replace('/login');
+                            return;
+                        }
+                        setError(`Failed to load data: ${res.statusText}`);
                     }
+                } catch (err) {
+                    setError("Network error. Please check your connection.");
                 }
+
             } catch (error) {
                 console.error("Dashboard Load Error", error);
+                setError("An unexpected error occurred.");
             } finally {
                 setIsLoading(false);
             }
@@ -104,7 +142,19 @@ export default function DashboardPage() {
         }, 250);
     };
 
-    if (isLoading) return null; // Or a sleek skeleton loader
+    if (isLoading) return <div className="p-8 text-center text-white">Loading dashboard...</div>;
+
+    if (error) {
+        return (
+            <main className="p-8 space-y-8 max-w-7xl mx-auto text-white text-center">
+                <div className="bg-red-900/50 p-6 rounded-xl border border-red-500">
+                    <h2 className="text-xl font-bold mb-2">Error</h2>
+                    <p>{error}</p>
+                    <button onClick={() => window.location.reload()} className="mt-4 bg-white text-red-900 px-4 py-2 rounded font-bold">Retry</button>
+                </div>
+            </main>
+        );
+    }
 
     return (
         <main className="p-8 space-y-8 max-w-7xl mx-auto text-white">
