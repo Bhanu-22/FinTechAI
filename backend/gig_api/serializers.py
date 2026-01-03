@@ -4,7 +4,7 @@ from .models import Shift, Expense, SavingsGoal
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shift
-        fields = ['id', 'user', 'date', 'earnings_amount', 'created_at']
+        fields = ['id', 'user', 'date', 'earnings_amount', 'platform', 'created_at']
         read_only_fields = ['id', 'user', 'created_at']
 
 class ExpenseSerializer(serializers.ModelSerializer):

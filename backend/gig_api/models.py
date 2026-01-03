@@ -7,10 +7,19 @@ class ActiveManager(models.Manager):
         return super().get_queryset().filter(archived_at__isnull=True)
 
 class Shift(models.Model):
+    PLATFORM_CHOICES = [
+        ('UBER', 'Uber'),
+        ('ZOMATO', 'Zomato'),
+        ('SWIGGY', 'Swiggy'),
+        ('RAPIDO', 'Rapido'),
+        ('MANUAL', 'Manual'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='gig_shifts')
     date = models.DateField()
     earnings_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES, default='MANUAL', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     archived_at = models.DateTimeField(null=True, blank=True, default=None)
 
@@ -21,7 +30,7 @@ class Shift(models.Model):
         constraints = []
 
     def __str__(self):
-        return f"{self.user.username} - {self.date} - {self.earnings_amount}"
+        return f"{self.user.username} - {self.date} - {self.earnings_amount} ({self.platform})"
 
 class Expense(models.Model):
     TYPE_CHOICES = [

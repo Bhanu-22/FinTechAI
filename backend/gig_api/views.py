@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.http import JsonResponse
 from datetime import date as dt_date
 from decimal import Decimal
@@ -100,7 +100,7 @@ class SavingsGoalViewSet(viewsets.ModelViewSet):
         status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(SavingsGoalSerializer(goal).data, status=status_code)
 
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from rest_framework.decorators import api_view, permission_classes
 from datetime import date as dt_date
 from decimal import Decimal
@@ -126,6 +126,20 @@ def daily_summary_view(request):
     # Earnings: Sum of shifts for this user on this date (EXCLUDE ARCHIVED)
     earnings_agg = Shift.active_objects.filter(user=request.user, date=target_date).aggregate(total=Sum('earnings_amount'))
     earnings_total = earnings_agg['total'] or Decimal('0.00')
+
+    # Platform Breakdown
+    platform_breakdown = (
+        Shift.active_objects.filter(
+            user=request.user,
+            date=target_date
+        )
+        .values('platform')
+        .annotate(
+            total_earnings=Sum('earnings_amount'),
+            shift_count=Count('id')
+        )
+        .order_by('-total_earnings')
+    )
 
     # Expenses: Link via Shift OR direct link to user for date (EXCLUDE ARCHIVED EXPENSES AND EXPENSES OF ARCHIVED SHIFTS)
     # We sum expenses linked to the shifts of that date.
@@ -161,7 +175,8 @@ def daily_summary_view(request):
         "earnings_total": earnings_total,
         "expenses_total": expenses_total,
         "net_income": net_income,
-        "savings_goal": goal_data
+        "savings_goal": goal_data,
+        "platform_breakdown": list(platform_breakdown)
     })
 
 @api_view(['GET'])
