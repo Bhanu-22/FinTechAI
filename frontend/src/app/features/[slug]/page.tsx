@@ -1,4 +1,4 @@
-import GradientBackground from "@/components/GradientBackground";
+import GradientBackground from "@/components/background/GradientBackground";
 import Link from "next/link";
 import { ArrowLeft, CheckCircle, AlertCircle, Zap } from "lucide-react";
 

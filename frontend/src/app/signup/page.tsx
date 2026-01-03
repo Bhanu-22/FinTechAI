@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/lib/auth";
 
 import Link from "next/link";
-import AntigravityBackground from "@/components/AntigravityBackground";
+import AntigravityBackground from "@/components/background/AntigravityBackground";
 import { Mail, Lock, User, Briefcase } from "lucide-react";
 
 export default function SignupPage() {

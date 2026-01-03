@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Artha - FinTechAI
+
+Artha is a financial intelligence platform for the gig economy, merchants, and freelancers. It provides tailored tools for inventory management, invoicing, expense tracking, and more.
+
+## Project Structure
+
+This project follows a monorepo-style structure:
+
+- **`frontend/`**: Next.js 15 application (App Router).
+  - **`src/features/`**: Domain logic for Gig, Merchants, and Freelancers.
+- **`backend/`**: Django REST Framework API.
+  - **`scripts/`**: Utility scripts for verification and management.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js (v18+)
+- Python (v3.10+)
+
+### 1. Frontend Config
+Navigate to the frontend directory and install dependencies:
 
 ```bash
+cd frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+The app will be available at [http://localhost:3000](http://localhost:3000).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Backend Config
+Navigate to the backend directory, set up your virtual environment, and run the server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd backend
+# Create virtual env (if not exists)
+python -m venv venv
+# Activate (Windows)
+.\venv\Scripts\activate
+# Install deps
+pip install -r requirements.txt
+# Run server
+python manage.py runserver
+```
+The API will be available at [http://localhost:8000](http://localhost:8000).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Key Features
+- **Merchants**: Voice inventory, WhatsApp billing, Smart Khata.
+- **Gig Workers**: Income tracking across platforms, daily goals.
+- **Freelancers**: Global invoicing, time tracking, expense swiping.

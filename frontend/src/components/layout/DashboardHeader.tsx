@@ -1,6 +1,6 @@
 "use client";
 
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+import ThemeSwitcher from "@/components/layout/ThemeSwitcher";
 import { Bell } from "lucide-react";
 
 export default function DashboardHeader() {

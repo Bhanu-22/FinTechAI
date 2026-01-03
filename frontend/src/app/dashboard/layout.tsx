@@ -1,5 +1,5 @@
-import Sidebar from "@/components/Sidebar";
-import DashboardHeader from "@/components/DashboardHeader";
+import Sidebar from "@/features/gig/components/DriverSidebar";
+import DashboardHeader from "@/components/layout/DashboardHeader";
 
 export default function DashboardLayout({
     children,

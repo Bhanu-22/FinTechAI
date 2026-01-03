@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import GigSidebar from "@/components/GigSidebar";
+import GigSidebar from "@/features/gig/components/Sidebar";
 import { useEffect } from "react";
 
 export default function GigLayout({ children }: { children: React.ReactNode }) {

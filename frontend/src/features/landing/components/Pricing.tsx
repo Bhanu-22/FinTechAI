@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
-import FeatureModal from "./FeatureModal";
+import FeatureModal from "@/components/dashboard/FeatureModal";
 import { Check } from "lucide-react";
 
 export default function Pricing() {
