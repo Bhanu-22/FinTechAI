@@ -7,7 +7,11 @@ from django.http import JsonResponse
 from datetime import date as dt_date
 from decimal import Decimal
 from .models import Shift, Expense, SavingsGoal
+from .models import Shift, Expense, SavingsGoal
 from .serializers import ShiftSerializer, ExpenseSerializer, SavingsGoalSerializer
+from .services.sms_integration import SMSIntegrationService
+
+sms_service = SMSIntegrationService()
 
 class ShiftViewSet(viewsets.ModelViewSet):
     serializer_class = ShiftSerializer
@@ -211,6 +215,47 @@ def habit_status_view(request):
         "savings_goal_set_today": goal_set,
         "day_completed": day_completed
     })
+
+    return Response({
+        "shift_logged_today": shift_logged,
+        "expenses_logged_today": expenses_logged,
+        "savings_goal_set_today": goal_set,
+        "day_completed": day_completed
+    })
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def parse_sms_view(request):
+    if request.user.role != 'GIG_WORKER':
+        return Response({"detail": "Only Gig Workers can parse SMS."}, status=status.HTTP_403_FORBIDDEN)
+    
+    sms_body = request.data.get('sms_body')
+    if not sms_body:
+        return Response({"detail": "SMS body is required."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    result = sms_service.parse_sms(sms_body)
+    if result:
+        return Response(result)
+    else:
+        return Response({"detail": "Could not parse SMS. Format not recognized."}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def confirm_sms_view(request):
+    if request.user.role != 'GIG_WORKER':
+        return Response({"detail": "Only Gig Workers can confirm shifts."}, status=status.HTTP_403_FORBIDDEN)
+        
+    parsed_data = request.data
+    # Basic validation
+    required_fields = ['platform', 'amount', 'date']
+    if not all(k in parsed_data for k in required_fields):
+        return Response({"detail": "Invalid payload."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        shift = sms_service.confirm_and_create_shift(parsed_data, request.user.id)
+        return Response(ShiftSerializer(shift).data, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 def gig_welcome(request):
     return JsonResponse({"message": "Welcome to the Gig Worker API"})
