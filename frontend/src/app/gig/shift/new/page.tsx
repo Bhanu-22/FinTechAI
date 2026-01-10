@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Wallet, Calendar, DollarSign, Loader2 } from "lucide-react";
+import { ArrowLeft, Wallet, Calendar, DollarSign, Loader2, Target } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function AddEarningsPage() {
@@ -10,7 +10,8 @@ export default function AddEarningsPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
-        earnings_amount: ""
+        earnings_amount: "",
+        platform: "MANUAL"
     });
 
     useEffect(() => {
@@ -37,7 +38,8 @@ export default function AddEarningsPage() {
                 },
                 body: JSON.stringify({
                     date: formData.date,
-                    earnings_amount: parseFloat(formData.earnings_amount)
+                    earnings_amount: parseFloat(formData.earnings_amount),
+                    platform: formData.platform
                 })
             });
 
@@ -106,6 +108,28 @@ export default function AddEarningsPage() {
                             className="w-full bg-[#0B1E1B] border border-[#1F453F] rounded-xl p-4 pl-10 text-3xl font-bold text-white placeholder-gray-700 focus:outline-none focus:border-[var(--gig-primary)] transition-colors"
                         />
                     </div>
+                </div>
+
+                {/* Platform Selection */}
+                <div className="space-y-2">
+                    <label className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        Platform
+                    </label>
+
+                    <select
+                        value={formData.platform}
+                        onChange={(e) =>
+                            setFormData({ ...formData, platform: e.target.value })
+                        }
+                        className="w-full bg-[#0B1E1B] border border-[#1F453F] rounded-xl p-4 text-white focus:outline-none focus:border-[var(--gig-primary)] transition-colors"
+                    >
+                        <option value="MANUAL">✏️ Manual Entry</option>
+                        <option value="UBER">🚗 Uber</option>
+                        <option value="ZOMATO">🍔 Zomato</option>
+                        <option value="SWIGGY">🥘 Swiggy</option>
+                        <option value="RAPIDO">🏍️ Rapido</option>
+                    </select>
                 </div>
 
                 {/* Submit Button */}

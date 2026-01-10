@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti"; // Requires npm install canvas-confetti
+import SMSConsent from "../../../components/SMSConsent";
 
 // Types
 import { API_URL } from "../../../config";
@@ -27,6 +28,11 @@ interface DashboardData {
         progress_percentage: number;
         status: string;
     } | null;
+    platform_breakdown?: Array<{
+        platform: string;
+        total_earnings: string;
+        shift_count: number;
+    }>;
 }
 
 interface HabitStatus {
@@ -57,6 +63,7 @@ export default function DashboardPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [user] = useState("Ramesh");
+    const [showSMSConsent, setShowSMSConsent] = useState(false);
 
     useEffect(() => {
         // Enforce Theme (Redundant with layout but safe)
@@ -117,7 +124,25 @@ export default function DashboardPage() {
         };
 
         fetchDashboardData();
+
+        // Check for SMS Consent
+        const consent = localStorage.getItem("sms_auto_import");
+        if (!consent) {
+            // Small delay to not overwhelm the user immediately
+            const timer = setTimeout(() => setShowSMSConsent(true), 1500);
+            return () => clearTimeout(timer);
+        }
     }, [router]);
+
+    const handleSMSAccept = () => {
+        localStorage.setItem("sms_auto_import", "enabled");
+        setShowSMSConsent(false);
+    };
+
+    const handleSMSDecline = () => {
+        localStorage.setItem("sms_auto_import", "declined");
+        setShowSMSConsent(false);
+    };
 
     const triggerCelebration = () => {
         // Confetti Canvas Animation
@@ -237,6 +262,44 @@ export default function DashboardPage() {
                 </div>
             </section>
 
+            {/* Earnings by Platform */}
+            {data?.platform_breakdown && data.platform_breakdown.length > 0 && (
+                <section className="bg-[var(--bg-card)] rounded-3xl p-8 border border-[#1F453F]">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-10 h-10 rounded-lg bg-[#1F453F] flex items-center justify-center">
+                            <TrendingUp className="w-5 h-5 text-[var(--gig-primary)]" />
+                        </div>
+                        <h2 className="text-xl font-bold">Earnings by Platform</h2>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {data.platform_breakdown.map((p) => (
+                            <motion.div
+                                key={p.platform}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="bg-[#0B1E1B] p-4 rounded-xl border border-[#1F453F] text-center"
+                            >
+                                <div className="text-2xl mb-2">
+                                    {p.platform === "UBER" && "🚗"}
+                                    {p.platform === "ZOMATO" && "🍔"}
+                                    {p.platform === "SWIGGY" && "🥘"}
+                                    {p.platform === "RAPIDO" && "🏍️"}
+                                    {p.platform === "MANUAL" && "✏️"}
+                                </div>
+
+                                <p className="text-xs text-[var(--text-muted)] mb-1">{p.platform}</p>
+                                <p className="text-lg font-bold">₹{p.total_earnings}</p>
+                                <p className="text-xs text-[var(--text-muted)]">
+                                    {p.shift_count} trips
+                                </p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
             <div className="grid md:grid-cols-3 gap-8">
                 {/* Savings Goal Card */}
                 <section className="md:col-span-2 bg-[var(--bg-card)] rounded-3xl p-8 border border-[#1F453F] relative">
@@ -351,6 +414,15 @@ export default function DashboardPage() {
                     </div>
                 </section>
             </div>
-        </main>
+
+            {
+                showSMSConsent && (
+                    <SMSConsent
+                        onAccept={handleSMSAccept}
+                        onDecline={handleSMSDecline}
+                    />
+                )
+            }
+        </main >
     );
 }
